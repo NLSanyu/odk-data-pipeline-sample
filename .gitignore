@@ -1,17 +1,11 @@
 # env file
 .env
 
+# Virtualenv
+venv/
+
 # VSCode files
 .vscode/
 
 # pycache
 __pycache__/
-
-# Temporary data files
-zipped/
-unzipped/
-*.zip
-
-
-# Final data file
-*.json
