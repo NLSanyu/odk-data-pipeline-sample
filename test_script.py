@@ -16,10 +16,7 @@ def authenticate():
         json=credentials,
         headers=headers
     )
-    print(email)
-    print(password)
-    print(credentials)
-
+    
     print(response.text)
 
 if __name__=='__main__':
