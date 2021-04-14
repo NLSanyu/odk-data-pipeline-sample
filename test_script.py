@@ -1,19 +1,23 @@
 import json
 import requests
 from decouple import config
-# from urllib2 import Request, urlopen
 
 
 base_url = 'https://sunbirdainoise.mooo.com/v1'
+project_id = '2'
+form_id = 'build_Noise-Capture-Form_1614927723'
+example_submission_uuid = 'uuid:96454e03-14af-4f13-93ca-67b73feb3dc3'
+example_submission_filename = '1618068976573.wav'
 
 def authenticate():
     email = config('ODK_EMAIL')
     password = config('ODK_PASSWORD')
 
     headers = {'Content-Type': 'application/json'}
+    url = f'{base_url}/sessions'
 
     response = requests.post(
-        url=base_url + '/sessions',
+        url=url,
         json={'email': email, 'password': password},
         headers=headers
     )
@@ -22,50 +26,36 @@ def authenticate():
         return response.json()['token']
 
 def list_forms():
-    token = authenticate()
-    headers = {'Authorization': 'Bearer' + token}
-
-    response = requests.get(
-        url=base_url + '/projects/2/forms',
-        headers=headers
-    )
-
-    print(response.text)
+    url = f'{base_url}/projects/{project_id}/forms'
+    get_request(url)
 
 def list_form_submissions():
-    token = authenticate()
-    headers = {'Authorization': 'Bearer' + token}
-
-    response = requests.get(
-        url=base_url + '/projects/2/forms/build_Noise-Capture-Form_1614927723/submissions',
-        headers=headers
-    )
-
-    print(response.text)
+    url = f'{base_url}/projects/{project_id}/forms/{form_id}/submissions'
+    get_request(url)
 
 def form_details():
+    url = f'{base_url}/projects/{project_id}/forms/{form_id}'
+    get_request(url)
+
+def download_attachment():
+    url = f'''{base_url}/projects/{project_id}/forms/{form_id}/submissions/{example_submission_uuid}/attachments/{example_submission_filename}'''
+    get_request(url)
+
+
+def get_request(url):
     token = authenticate()
     headers = {'Authorization': 'Bearer' + token}
-
     response = requests.get(
-        url=base_url + '/projects/2/forms/build_Noise-Capture-Form_1614927723',
+        url=url,
         headers=headers
     )
 
-    print(response.text)
-
-def download_attachment():
-    filename = '1618068976573.wav'
-    url = base_url + '/projects/2/forms/build_Noise-Capture-Form_1614927723/submissions/uuid:96454e03-14af-4f13-93ca-67b73feb3dc3/attachments/1618068976573.wav'
-    response = requests.get(url)
-
-    # response_body = urlopen(request).read()
     print(response.text)
 
 
 if __name__=='__main__':
     # authenticate()
-    list_forms()
+    # list_forms()
     # list_form_submissions()
     # form_details()
-    # download_attachment()
+    download_attachment()
