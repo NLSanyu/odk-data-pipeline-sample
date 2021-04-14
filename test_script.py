@@ -1,6 +1,8 @@
 import json
 import requests
 from decouple import config
+# from urllib2 import Request, urlopen
+
 
 base_url = 'https://sunbirdainoise.mooo.com/v1'
 
@@ -52,8 +54,18 @@ def form_details():
 
     print(response.text)
 
+def download_attachment():
+    filename = '1618068976573.wav'
+    url = base_url + '/projects/2/forms/build_Noise-Capture-Form_1614927723/submissions/uuid:96454e03-14af-4f13-93ca-67b73feb3dc3/attachments/1618068976573.wav'
+    response = requests.get(url)
+
+    # response_body = urlopen(request).read()
+    print(response.text)
+
 
 if __name__=='__main__':
-    # list_forms()
+    # authenticate()
+    list_forms()
     # list_form_submissions()
-    form_details()
+    # form_details()
+    # download_attachment()
