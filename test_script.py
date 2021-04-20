@@ -3,59 +3,68 @@ import requests
 from decouple import config
 
 
-base_url = 'https://sunbirdainoise.mooo.com/v1'
-project_id = '2'
-form_id = 'build_Noise-Capture-Form_1614927723'
-example_submission_uuid = 'uuid:96454e03-14af-4f13-93ca-67b73feb3dc3'
-example_submission_filename = '1618068976573.wav'
+base_url = 'https://sunbirdainoise.mooo.com/'
+headers = {}
 
 def authenticate():
     email = config('ODK_EMAIL')
     password = config('ODK_PASSWORD')
-
-    headers = {'Content-Type': 'application/json'}
-    url = f'{base_url}/sessions'
+    login_url = f'{base_url}v1/sessions'
 
     response = requests.post(
-        url=url,
-        json={'email': email, 'password': password},
-        headers=headers
+        login_url,
+        json={'email': email, 'password': password}
     )
 
     if response.status_code == 200:
         return response.json()['token']
+    else:
+        return response.text
 
-def list_forms():
-    url = f'{base_url}/projects/{project_id}/forms'
-    get_request(url)
-
-def list_form_submissions():
-    url = f'{base_url}/projects/{project_id}/forms/{form_id}/submissions'
-    get_request(url)
-
-def form_details():
-    url = f'{base_url}/projects/{project_id}/forms/{form_id}'
-    get_request(url)
-
-def download_attachment():
-    url = f'''{base_url}/projects/{project_id}/forms/{form_id}/submissions/{example_submission_uuid}/attachments/{example_submission_filename}'''
-    get_request(url)
-
-
-def get_request(url):
+def get_submissions():
     token = authenticate()
-    headers = {'Authorization': 'Bearer' + token}
-    response = requests.get(
-        url=url,
-        headers=headers
-    )
+    headers = {'Authorization': f'Bearer {token}'}
+    service_params = {
+        'projectId': '2',
+        'xmlFormId': 'build_Noise-Capture-Form_1614927723'
+    }
+    service_doc_url = f'{base_url}v1/projects/{service_params["projectId"]}/forms/{service_params["xmlFormId"]}.svc'
+    service_doc_response = requests.get(service_doc_url, headers=headers)
 
-    print(response.text)
+    if service_doc_response.status_code != 200:
+        return service_doc_response.text
 
+    retrieve_url = f'{service_doc_url}/{service_doc_response.json()["value"][0]["name"]}'
+    ret_params = {
+        #'$top': '20', # Specify number of records to fetch
+        '$count': 'true' # Returns total count of items in table
+    }
+    r_retrieve = requests.get(retrieve_url, headers=headers, params=ret_params)
+    print(r_retrieve.status_code)
+    print(r_retrieve.json())
+
+    form_attach_url = f'{base_url}v1/projects/{service_params["projectId"]}/forms/{service_params["xmlFormId"]}/attachments'
+    r_form_attach = requests.get(form_attach_url, headers=headers)
+    print(r_form_attach.text)
+
+    # filename = r_retrieve.json()["value"][0]['Noise']['audio']
+    # file_download_url = f'{base_url}v1/projects/{service_params["projectId"]}/forms/{service_params["xmlFormId"]}/attachments/{filename}'
+    # headers = headers = {
+    #     'Authorization': f'Bearer {token}',
+    #     'Content-Type': 'image/jpeg',
+    #     'Content-Disposition': f'attachment;filename={filename}'
+    # }
+
+    # # Alternative construction for audio url
+    # audio_id = requests.utils.quote(r_retrieve.json()["value"][0]['__id'])
+    # audio_name = r_retrieve.json()["value"][0]['Noise']['audio']
+    # audio_url = f'{base_url}v1/projects/{service_params["projectId"]}/forms/{service_params["xmlFormId"]}/submissions/{audio_id}/attachments/{audio_name}'
+
+    # response = requests.get(audio_url, headers=headers)
+
+    # file = open("audiofile", "wb")
+    # file.write(response.content)
+    # file.close()
 
 if __name__=='__main__':
-    # authenticate()
-    # list_forms()
-    # list_form_submissions()
-    # form_details()
-    download_attachment()
+    get_submissions()
