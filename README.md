@@ -1,3 +1,3 @@
-# Sunbird Noise Project Workflow
+# Sunbird Noise Project Data Pipeline
 
-Airflow workflow for the Sunbird Noise Pollution project
+Airflow pipeline/workflow for the Sunbird Noise Pollution project
