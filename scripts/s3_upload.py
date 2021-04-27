@@ -22,4 +22,4 @@ def get_today_date():
 
 
 if __name__ == '__main__':
-    upload_files_to_s3('.')
+    upload_files_to_s3('audio/')
