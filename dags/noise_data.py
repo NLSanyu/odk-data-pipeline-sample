@@ -4,9 +4,6 @@ from airflow.operators.python_operator import PythonOperator
 from datetime import datetime, timedelta
 
 
-def download_odk_csv():
-    print("Download csv")
-
 def download_odk_media():
     print("Download media")
 
@@ -23,12 +20,6 @@ data_transfer_dag = DAG(
     dag_id='prepare_data',
     default_args=default_args,
     schedule_interval='@daily'
-)
-
-download_odk_csv_task = PythonOperator(
-    task_id='download_csv_task',
-    python_callable=download_odk_csv,
-    dag=data_transfer_dag
 )
 
 download_odk_media_task = PythonOperator(
