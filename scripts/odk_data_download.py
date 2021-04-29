@@ -4,7 +4,7 @@ from decouple import config
 from pathlib import Path
 
 
-base_url = 'https://sunbirdainoise.mooo.com/'
+base_url = config('ODK_PROJECT_URL')
 headers = {}
 
 def authenticate():
@@ -26,8 +26,8 @@ def get_submissions():
     token = authenticate()
     headers = {'Authorization': f'Bearer {token}'}
     service_params = {
-        'projectId': '2',
-        'xmlFormId': 'build_Noise-Capture-Form_1614927723'
+        'projectId': config('ODK_PROJECT_ID'),
+        'xmlFormId': config('ODK_FORM_ID')
     }
     service_doc_url = f'{base_url}v1/projects/{service_params["projectId"]}/forms/{service_params["xmlFormId"]}.svc'
     service_doc_response = requests.get(service_doc_url, headers=headers)
