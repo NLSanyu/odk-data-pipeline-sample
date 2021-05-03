@@ -1,8 +1,13 @@
 import json
 import requests
+import logging
 from decouple import config
 from pathlib import Path
 
+logging.basicConfig(filename='app.log', 
+    format='%(asctime)s - %(message)s',
+    level=logging.INFO
+)
 
 base_url = config('ODK_PROJECT_URL')
 headers = {}
@@ -30,18 +35,24 @@ def get_submissions():
         'xmlFormId': config('ODK_FORM_ID')
     }
     service_doc_url = f'{base_url}v1/projects/{service_params["projectId"]}/forms/{service_params["xmlFormId"]}.svc'
-    service_doc_response = requests.get(service_doc_url, headers=headers)
+
+    try:
+        service_doc_response = requests.get(service_doc_url, headers=headers)
+    except requests.exceptions.RequestException as err:
+        logging.error(f'Service document error: {err}')
 
     if service_doc_response.status_code != 200:
-        return service_doc_response.text
+        logging.error(f'Service document error: {service_doc_response.text}')
 
     retrieve_url = f'{service_doc_url}/{service_doc_response.json()["value"][0]["name"]}'
     params = {
         '$filter': 'day(__system/submissionDate) eq day(now())'
     }
 
-    r_retrieve = requests.get(retrieve_url, headers=headers, params=params)
-    print(r_retrieve.status_code)
+    try:
+        r_retrieve = requests.get(retrieve_url, headers=headers, params=params)
+    except requests.exceptions.RequestException as err:
+        logging.error(f'Error retrieving submissions: {err}')
 
     Path('audio').mkdir(parents=True, exist_ok=True)
     
