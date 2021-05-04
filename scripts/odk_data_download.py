@@ -48,7 +48,7 @@ def get_submissions():
 
     retrieve_url = f'{service_doc_url}/{service_doc_response.json()["value"][0]["name"]}'
     params = {
-        '$filter': 'day(__system/submissionDate) eq day(now())'
+        '$filter': 'day(__system/submissionDate) eq day(now()) and month(__system/submissionDate) eq month(now()) and year(__system/submissionDate) eq year(now())'
     }
 
     try:
@@ -57,8 +57,14 @@ def get_submissions():
         logger.error(f'Error retrieving submissions: {err}')
 
     Path('audio').mkdir(parents=True, exist_ok=True)
-    
-    for item in r_retrieve.json()['value']:
+
+    items = r_retrieve.json().get('value', None)
+
+    if not items:
+        logger.error('No items returned')
+        return None
+
+    for item in items:
         audio_id = requests.utils.quote(item['__id'])
         audio_name = item['Noise']['audio']
         audio_url = f'{base_url}v1/projects/{service_params["projectId"]}/forms/{service_params["xmlFormId"]}/submissions/{audio_id}/attachments/{audio_name}'
