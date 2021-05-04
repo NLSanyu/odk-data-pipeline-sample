@@ -9,6 +9,8 @@ logging.basicConfig(filename='app.log',
     level=logging.INFO
 )
 
+logger = logging.getLogger(__name__)
+
 base_url = config('ODK_PROJECT_URL')
 headers = {}
 
@@ -39,10 +41,10 @@ def get_submissions():
     try:
         service_doc_response = requests.get(service_doc_url, headers=headers)
     except requests.exceptions.RequestException as err:
-        logging.error(f'Service document error: {err}')
+        logger.error(f'Service document error: {err}')
 
     if service_doc_response.status_code != 200:
-        logging.error(f'Service document error: {service_doc_response.text}')
+        logger.error(f'Service document error: {service_doc_response.text}')
 
     retrieve_url = f'{service_doc_url}/{service_doc_response.json()["value"][0]["name"]}'
     params = {
@@ -52,7 +54,7 @@ def get_submissions():
     try:
         r_retrieve = requests.get(retrieve_url, headers=headers, params=params)
     except requests.exceptions.RequestException as err:
-        logging.error(f'Error retrieving submissions: {err}')
+        logger.error(f'Error retrieving submissions: {err}')
 
     Path('audio').mkdir(parents=True, exist_ok=True)
     
@@ -65,6 +67,8 @@ def get_submissions():
         target_file = f'audio/{audio_name}'
         with open(target_file, 'wb') as f:
             f.write(response.content)
+
+        logger.info(f'Downloaded audio/{audio_name}')
 
 if __name__=='__main__':
     get_submissions()
