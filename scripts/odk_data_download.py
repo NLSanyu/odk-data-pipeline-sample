@@ -19,15 +19,20 @@ def authenticate():
     password = config('ODK_PASSWORD')
     login_url = f'{base_url}v1/sessions'
 
-    response = requests.post(
-        login_url,
-        json={'email': email, 'password': password}
-    )
+    try:
+        response = requests.post(
+            login_url,
+            json={'email': email, 'password': password}
+        )
+    except requests.exceptions.RequestException as err:
+        logger.error(f'Authentication error: {err}')
 
-    if response.status_code == 200:
-        return response.json()['token']
-    else:
-        return response.text
+    if response.status_code != 200:
+        logger.error(f'Authentication failed')
+        return None
+
+    logger.info('Authenticated')
+    return response.json()['token']
 
 def get_submissions():
     token = authenticate()
