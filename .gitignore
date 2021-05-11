@@ -16,3 +16,12 @@ audio/
 
 # logs
 *.log
+
+# csv files
+/*.csv
+
+# notebooks
+.ipynb_checkpoints
+
+# test scripts
+test_scripts.py
