@@ -8,7 +8,7 @@ bucket = config('S3_BUCKET_NAME')
 folder = 'noise_audio'
 
 
-def upload_files_to_s3(local_dir_path):
+def upload_to_s3(local_dir_path):
     date_today = get_today_date()
     for filename in os.listdir(local_dir_path):
         if filename.endswith('.wav'):
@@ -22,4 +22,4 @@ def get_today_date():
 
 
 if __name__ == '__main__':
-    upload_files_to_s3('audio/')
+    upload_to_s3('audio')
